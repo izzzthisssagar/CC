@@ -1,0 +1,17 @@
+/* Design tokens. Brand = crimson (Nepali identity). Generated via ui-design-system,
+   trimmed to what the app uses. Caption colors are functional (high-contrast over
+   video), not brand. */
+
+:root {
+  /* Brand (crimson). NOTE: white text needs brand-600+ for WCAG AA
+     (brand-500 = 3.84:1, fails normal text; brand-600 = 6.07:1, passes). */
+  --brand-400: #f26b86;
+  --brand-500: #dc526d;
+  --brand-600: #b0354d;
+  --brand-700: #841e32;
+
+  /* Caption semantics — legibility comes from the outline, not fill-vs-bg. */
+  --caption-fill: #ffffff;        /* base word */
+  --caption-active: #facc15;      /* current/karaoke word (Hormozi yellow) */
+  --caption-outline: #000000;     /* stroke — worker burns outline=3 */
+}
