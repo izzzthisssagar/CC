@@ -49,28 +49,8 @@ def transcribe_audio(
     if stub:
         return _STUB_WORDS, "ne"
 
-    from groq import Groq
+    from .stt import transcribe as stt_transcribe
 
     audio_path = _extract_audio(video_url)
-    client = Groq(api_key=os.environ["GROQ_API_KEY"])
-    kwargs = {"language": language} if language else {}
-    with open(audio_path, "rb") as f:
-        res = client.audio.transcriptions.create(
-            file=f,
-            model="whisper-large-v3-turbo",
-            response_format="verbose_json",
-            timestamp_granularities=["word"],
-            prompt=NINGLISH_PROMPT,
-            **kwargs,
-        )
-
-    # Groq returns words as dicts (some lib versions as objects) — handle both.
-    def field(w, k):
-        return w[k] if isinstance(w, dict) else getattr(w, k)
-
-    words = [
-        {"word": field(w, "word"), "start": field(w, "start"), "end": field(w, "end")}
-        for w in (res.words or [])
-    ]
-    language = getattr(res, "language", "ne")
-    return words, language
+    # provider chosen by STT_PROVIDER env (default groq); see app/stt.py.
+    return stt_transcribe(audio_path, language=language)
