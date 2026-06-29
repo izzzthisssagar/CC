@@ -1,4 +1,4 @@
-# Web — Next.js 14 (App Router)
+# Web — Next.js 15 (App Router)
 
 Frontend + API routes. Pages: `/` (landing), `/upload` (dropzone), `/editor/[id]`
 (caption preview + style picker + export). API routes proxy to the Python worker.

@@ -11,7 +11,7 @@ SRT/VTT. Built for Nepali creators; a Nepali-native answer to kalakar.io.
 
 | Path | What |
 |------|------|
-| `web/` | Next.js 14 (App Router) + Tailwind — frontend + API routes |
+| `web/` | Next.js 15 (App Router) + React 19 + Tailwind — frontend + API routes |
 | `worker/` | FastAPI — `/transcribe` (Groq Whisper), `/export` (pysubs2 + FFmpeg burn-in) |
 | `supabase/` | DB migrations (Postgres + pgvector) |
 | `docs/` | `BLUEPRINT.md` (decisions), `ARCHITECTURE.md` (MVP data flow) |
@@ -37,7 +37,7 @@ Without keys, `/transcribe` and `/export` return mock data so the UI still runs 
 
 ## Stack (MVP)
 
-Next.js 14 · Tailwind · Groq Whisper large-v3-turbo · FastAPI + FFmpeg/libass · Supabase
+Next.js 15 · React 19 · Tailwind · Groq Whisper large-v3-turbo · FastAPI + FFmpeg/libass · Supabase
 (Postgres + Auth + pgvector + Storage). Full SaaS stack (Modal, Inngest, R2, Cloudinary)
 is documented in `docs/BLUEPRINT.md` for the scale-up phase.
 

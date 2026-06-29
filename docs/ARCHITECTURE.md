@@ -70,7 +70,7 @@ and routes degrade gracefully — the whole flow runs offline.
 
 ## Components
 
-- **web/** — Next.js 14 App Router. Pages: `/` (landing), `/upload` (dropzone),
+- **web/** — Next.js 15 App Router (React 19). Pages: `/` (landing), `/upload` (dropzone),
   `/editor/[id]` (caption preview + style picker + export). API routes proxy to worker and
   Supabase. Clients in `web/lib/` are stubbed until keys exist.
 - **worker/** — FastAPI. `POST /transcribe {video_url|file}` → audio extract → Groq →

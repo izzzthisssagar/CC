@@ -17,7 +17,7 @@ are intentionally not yet implemented — they are tracked here so they are not 
 | **SSRF / local-file-read on `video_url`** | **Mitigated** | `worker/app/security.py` — `validate_source_url` blocks non-https, private/link-local IPs (incl. `169.254.169.254` metadata), and enforces `ALLOWED_SOURCE_HOSTS`. Set that env var to your Supabase Storage host in prod. |
 | Worker CORS `allow_origins=["*"]` | Dev only | `worker/app/main.py` — tighten to the web origin before prod. |
 | Dependency CVE scan | Active | Lockfile committed; Dependabot configured (`.github/dependabot.yml`). |
-| Next.js version | Partially patched | Bumped 14.2.18 → **14.2.35** (clears the deprecated-version CVE). `npm audit` still flags Next DoS advisories whose fix range reaches **Next 15** — a major migration (async request APIs). **Deferred to a pre-launch task**; these are availability (DoS) issues on `next/image`/RSC configs we barely use, acceptable for a zero-traffic MVP. **Migrate to Next 15 before public launch.** |
+| Next.js version | **Patched** | Migrated **14.2.35 → Next 15.5.19 / React 19** (Phase 4) — clears the Next 14.x DoS advisories that gated on a Next 15 fix range. The async-request-API change touched only `editor/[id]/page.tsx` (`params`/`searchParams` now awaited). Remaining `npm audit` moderates are dev/build-time transitive deps (jest-snapshot, nested postcss), not runtime Next CVEs. |
 
 ## Controls mapped to Phase 1 (Supabase Auth)
 
