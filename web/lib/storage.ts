@@ -5,24 +5,29 @@ const BUCKET = "videos";
 export type Upload = { id: string; url: string };
 
 /**
- * Upload a video to Supabase Storage and return its id + public URL.
- * Returns null in stub mode (no Supabase env) so callers fall back to the demo flow.
- *
- * NOTE: uses a public URL for MVP simplicity. For private content, switch to
- * createSignedUrl (and keep the bucket private). The worker's SSRF guard requires
- * the Supabase host to be in ALLOWED_SOURCE_HOSTS.
+ * Upload a video to Supabase Storage AND create its `videos` row (RLS-scoped to
+ * the signed-in user). Returns the video id + public URL, or null in stub mode.
  */
 export async function uploadVideo(file: File): Promise<Upload | null> {
   const sb = getSupabase();
   if (!sb) return null; // stub mode
 
+  const { data: u } = await sb.auth.getUser();
+  const userId = u.user?.id;
+  if (!userId) throw new Error("not signed in");
+
   const id = crypto.randomUUID();
   const path = `${id}/${file.name}`;
-  const { error } = await sb.storage.from(BUCKET).upload(path, file, {
-    cacheControl: "3600",
-    upsert: false,
+  const up = await sb.storage.from(BUCKET).upload(path, file, { upsert: false });
+  if (up.error) throw new Error(`upload failed: ${up.error.message}`);
+
+  const ins = await sb.from("videos").insert({
+    id,
+    user_id: userId,
+    storage_path: path,
+    status: "uploaded",
   });
-  if (error) throw new Error(`upload failed: ${error.message}`);
+  if (ins.error) throw new Error(`videos insert failed: ${ins.error.message}`);
 
   const { data } = sb.storage.from(BUCKET).getPublicUrl(path);
   return { id, url: data.publicUrl };

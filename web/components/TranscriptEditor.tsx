@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CaptionPreview } from "./CaptionPreview";
 import { StylePicker } from "./StylePicker";
 import { useRequireAuth } from "./AuthProvider";
+import { loadTranscript, saveTranscript } from "@/lib/transcripts";
 
 type Word = { word: string; start: number; end: number };
 
@@ -27,31 +28,60 @@ export function TranscriptEditor({
 }) {
   const { ready } = useRequireAuth();
   const [words, setWords] = useState<Word[]>(MOCK_WORDS);
-  const [source, setSource] = useState<"mock" | "worker">("mock");
+  const [source, setSource] = useState<"mock" | "worker" | "saved">("mock");
+  const [transcriptId, setTranscriptId] = useState<string | null>(null);
+  const persistable = videoId !== "demo"; // real uploaded video
 
   useEffect(() => {
     let cancelled = false;
-    // Same-origin proxy → worker submit+poll → words. Uses the real Storage URL
-    // when present (from upload), else a stub URL (worker returns mock in stub mode).
-    fetch("/api/transcribe", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ video_url: videoUrl ?? `stub://${videoId}` }),
-    })
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data) => {
+    async function run() {
+      // 1. Load a previously saved transcript (skip re-transcribing / re-paying Groq).
+      if (persistable) {
+        try {
+          const saved = await loadTranscript(videoId);
+          if (saved && saved.words.length) {
+            if (!cancelled) {
+              setWords(saved.words);
+              setTranscriptId(saved.id);
+              setSource("saved");
+            }
+            return;
+          }
+        } catch {
+          /* fall through to transcribe */
+        }
+      }
+      // 2. Transcribe via worker (same-origin proxy → submit+poll).
+      try {
+        const res = await fetch("/api/transcribe", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ video_url: videoUrl ?? `stub://${videoId}` }),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
         if (!cancelled && Array.isArray(data.words) && data.words.length) {
           setWords(data.words);
           setSource("worker");
+          // 3. Persist for next load (real videos only).
+          if (persistable) {
+            try {
+              const tid = await saveTranscript(videoId, data.words, data.language ?? null);
+              if (tid && !cancelled) setTranscriptId(tid);
+            } catch {
+              /* save best-effort */
+            }
+          }
         }
-      })
-      .catch(() => {
+      } catch {
         /* worker offline → keep mock */
-      });
+      }
+    }
+    run();
     return () => {
       cancelled = true;
     };
-  }, [videoId, videoUrl]);
+  }, [videoId, videoUrl, persistable]);
 
   // Correction loop: a real edit updates the preview AND records training data.
   async function onWordEdit(i: number, raw: string) {
@@ -64,6 +94,7 @@ export function TranscriptEditor({
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
+          transcript_id: transcriptId,
           word_index: i,
           original_text: original,
           corrected_text: next,
@@ -81,7 +112,7 @@ export function TranscriptEditor({
   return (
     <>
       <p className="mt-1 text-sm text-neutral-500">
-        Word-level transcript ({source === "worker" ? "from worker" : "mock — worker offline"}).
+        Word-level transcript ({source === "saved" ? "saved" : source === "worker" ? "from worker" : "mock — worker offline"}).
         Edit a word to correct it, pick a style, preview, export.
       </p>
       <div className="mt-8 grid gap-8 md:grid-cols-[1fr_280px]">
