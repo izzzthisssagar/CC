@@ -45,3 +45,6 @@ fonts/*.woff2
 # local tooling (not published)
 CLAUDE.md
 .claude/
+
+# graphify analysis output (local)
+graphify-out/

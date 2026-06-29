@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { loadLastStyle, saveLastStyle } from "@/lib/style";
 
 type Word = { word: string; start: number; end: number };
 
@@ -32,6 +33,21 @@ export function StylePicker({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ExportResult | null>(null);
+  const [remembered, setRemembered] = useState(false);
+
+  // RAG Feature 1 — style memory: pre-select the user's last-used template.
+  useEffect(() => {
+    let cancelled = false;
+    loadLastStyle().then((s) => {
+      if (!cancelled && s?.template && TEMPLATES.includes(s.template)) {
+        setTemplate(s.template);
+        setRemembered(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function onExport() {
     setBusy(true);
@@ -49,6 +65,7 @@ export function StylePicker({
       });
       if (!res.ok) throw new Error(`export failed (${res.status})`);
       setResult((await res.json()) as ExportResult);
+      saveLastStyle({ template }); // remember choice for next time
     } catch (e) {
       setError(e instanceof Error ? e.message : "Export failed");
     } finally {
@@ -59,7 +76,7 @@ export function StylePicker({
   return (
     <aside className="rounded-xl border border-neutral-800 p-5">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-        Style
+        Style {remembered && <span className="ml-1 text-yellow-400">· remembered</span>}
       </h2>
       <div className="mt-3 flex flex-col gap-2">
         {TEMPLATES.map((t) => (
