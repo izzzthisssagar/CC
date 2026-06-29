@@ -82,7 +82,7 @@ export function TranscriptEditor({
       </p>
       <div className="mt-8 grid gap-8 md:grid-cols-[1fr_280px]">
         <div className="flex flex-col gap-4">
-          <CaptionPreview words={words} />
+          <CaptionPreview words={words} videoUrl={videoUrl} />
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
               Transcript — edit to correct
