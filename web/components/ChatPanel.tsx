@@ -47,21 +47,21 @@ export function ChatPanel({ words }: { words: Word[] }) {
   }
 
   return (
-    <section className="mt-8 rounded-xl border border-neutral-800 p-5">
+    <section className="mt-8 rounded-sm border border-rule bg-ink-raised p-5">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+        <h2 className="kicker">
           {scope === "all" ? "Ask across my videos" : "Ask about this video"}
         </h2>
-        <div className="flex rounded border border-neutral-700 text-xs" role="group" aria-label="chat scope">
+        <div className="flex overflow-hidden rounded-sm border border-rule text-xs" role="group" aria-label="chat scope">
           {(["video", "all"] as const).map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => setScope(s)}
               aria-pressed={scope === s}
-              className={`px-2.5 py-1 ${
-                scope === s ? "bg-yellow-400 font-semibold text-black" : "text-neutral-400"
-              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400`}
+              className={`px-2.5 py-1 transition ${
+                scope === s ? "bg-brand-600 font-semibold text-paper" : "text-muted hover:text-fg"
+              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron`}
             >
               {s === "video" ? "This video" : "All videos"}
             </button>
@@ -69,19 +69,19 @@ export function ChatPanel({ words }: { words: Word[] }) {
         </div>
       </div>
 
-      <div className="mt-3 flex flex-col gap-3" aria-live="polite">
+      <div className="mt-4 flex flex-col gap-3" aria-live="polite">
         {turns.length === 0 && (
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm italic text-faint">
             e.g. &ldquo;What is this video about?&rdquo; · &ldquo;यो भिडियोमा के भनिएको छ?&rdquo;
           </p>
         )}
         {turns.map((t, i) => (
-          <div key={i} className="text-sm">
-            <p className="text-neutral-400">{t.q}</p>
-            <p className="mt-1 whitespace-pre-wrap">{t.a}</p>
+          <div key={i} className="border-l-2 border-brand-700/50 pl-3 text-sm">
+            <p className="font-medium text-muted">{t.q}</p>
+            <p className="mt-1 whitespace-pre-wrap text-fg">{t.a}</p>
           </div>
         ))}
-        {busy && <p className="text-sm text-neutral-500">Thinking…</p>}
+        {busy && <p className="text-sm italic text-faint">Thinking…</p>}
       </div>
 
       <form onSubmit={ask} className="mt-4 flex gap-2">
@@ -90,12 +90,12 @@ export function ChatPanel({ words }: { words: Word[] }) {
           onChange={(e) => setQ(e.target.value)}
           placeholder="Ask a question…"
           aria-label="question"
-          className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          className="flex-1 rounded-sm border border-rule bg-ink px-3 py-2 text-sm text-fg placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
         />
         <button
           type="submit"
           disabled={busy}
-          className="rounded bg-yellow-400 px-4 py-2 text-sm font-semibold text-black disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          className="rounded-sm bg-brand-600 px-4 py-2 text-sm font-semibold text-paper transition hover:bg-brand-500 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
         >
           Ask
         </button>

@@ -4,23 +4,98 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #08070a;
-  --fg: #f5f5f7;
-}
-
+/* ── Base ──────────────────────────────────────────────────────────────── */
 body {
-  background: var(--bg);
+  background: var(--ink);
   color: var(--fg);
-  /* subtle grain + brand glow for atmosphere, not flat black */
+  /* Editorial atmosphere: a warm crimson glow top-right, saffron wash bottom-left,
+     over deep ink. Fixed so it reads like printed stock, not a flat screen. */
   background-image:
-    radial-gradient(60rem 40rem at 80% -10%, rgba(220, 20, 60, 0.10), transparent 70%),
-    radial-gradient(50rem 30rem at -10% 10%, rgba(250, 204, 21, 0.05), transparent 70%);
+    radial-gradient(58rem 40rem at 88% -12%, rgba(220, 82, 109, 0.13), transparent 70%),
+    radial-gradient(46rem 30rem at -8% 108%, rgba(224, 162, 58, 0.07), transparent 70%);
   background-attachment: fixed;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Faint paper grain over everything — depth without weight. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.rise { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+::selection {
+  background: var(--brand-600);
+  color: var(--paper);
+}
+
+/* ── Editorial components ──────────────────────────────────────────────── */
+@layer components {
+  /* Kicker: small-caps label with a leading rule, like a magazine section head. */
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--saffron);
+  }
+  .kicker::before {
+    content: "";
+    width: 2rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.7;
+  }
+
+  /* Drop cap for a lead paragraph. */
+  .dropcap::first-letter {
+    font-family: var(--font-display);
+    font-weight: 600;
+    float: left;
+    font-size: 3.4em;
+    line-height: 0.72;
+    padding: 0.08em 0.12em 0 0;
+    color: var(--brand-500);
+  }
+
+  /* Hairline divider with a tiny diamond, newspaper-style. */
+  .rule-diamond {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--rule);
+  }
+  .rule-diamond::before,
+  .rule-diamond::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+  }
+}
+
+/* ── Motion ────────────────────────────────────────────────────────────── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rise { animation: rise 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@keyframes inkbleed {
+  from { opacity: 0; letter-spacing: 0.04em; filter: blur(6px); }
+  to   { opacity: 1; letter-spacing: normal; filter: blur(0); }
+}
+.inkbleed { animation: inkbleed 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .inkbleed { animation: none; }
+}

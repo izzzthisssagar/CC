@@ -18,12 +18,12 @@ export function HeroCaption() {
   }, []);
 
   return (
-    <div className="relative mx-auto aspect-video w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-neutral-900 to-black shadow-2xl">
+    <div className="relative mx-auto aspect-video w-full max-w-xl overflow-hidden rounded-sm border border-rule bg-gradient-to-br from-ink-raised to-ink-sunken shadow-2xl ring-1 ring-black/40">
       {/* faux video frame texture */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(220,20,60,0.18),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(220,82,109,0.2),transparent_55%)]" />
       <div className="absolute left-4 top-4 flex items-center gap-1.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
-        <span className="text-[10px] font-medium uppercase tracking-widest text-white/40">
+        <span className="h-2.5 w-2.5 rounded-full bg-brand-500" />
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-fg/40">
           ● REC · Nepali
         </span>
       </div>

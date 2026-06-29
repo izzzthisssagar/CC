@@ -16,7 +16,7 @@ const TEMPLATES = [
 ];
 
 const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-ink";
 
 type ExportResult = { mp4_url: string; srt_url: string };
 
@@ -74,21 +74,21 @@ export function StylePicker({
   }
 
   return (
-    <aside className="rounded-xl border border-neutral-800 p-5">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-        Style {remembered && <span className="ml-1 text-yellow-400">· remembered</span>}
+    <aside className="rounded-sm border border-rule bg-ink-raised p-5">
+      <h2 className="kicker">
+        Style {remembered && <span className="ml-1 normal-case tracking-normal text-brand-400">· remembered</span>}
       </h2>
-      <div className="mt-3 flex flex-col gap-2">
+      <div className="mt-4 flex flex-col gap-2">
         {TEMPLATES.map((t) => (
           <button
             key={t}
             type="button"
             aria-pressed={t === template}
             onClick={() => setTemplate(t)}
-            className={`rounded-lg px-3 py-2 text-left text-sm ${focusRing} ${
+            className={`rounded-sm px-3 py-2 text-left text-sm transition ${focusRing} ${
               t === template
-                ? "bg-yellow-400 text-black"
-                : "bg-neutral-900 hover:bg-neutral-800"
+                ? "bg-brand-600 font-semibold text-paper"
+                : "bg-ink text-fg hover:bg-ink-sunken"
             }`}
           >
             {t}
@@ -101,23 +101,23 @@ export function StylePicker({
         onClick={onExport}
         disabled={busy}
         aria-busy={busy}
-        className={`mt-6 w-full rounded-lg bg-white px-4 py-3 font-semibold text-black hover:bg-neutral-200 disabled:opacity-60 ${focusRing}`}
+        className={`mt-6 w-full rounded-sm bg-paper px-4 py-3 font-semibold text-ink transition hover:bg-paper/90 disabled:opacity-60 ${focusRing}`}
       >
         {busy ? "Exporting…" : "Export MP4 + SRT"}
       </button>
 
       <div role="status" aria-live="polite" className="mt-3 text-xs">
-        {error && <p className="text-red-400">{error}</p>}
+        {error && <p className="text-brand-400">{error}</p>}
         {result && (
-          <div className="flex flex-col gap-1 text-neutral-300">
-            <a className="underline hover:text-white" href={result.mp4_url}>
+          <div className="flex flex-col gap-1 text-muted">
+            <a className="text-saffron underline decoration-saffron/40 underline-offset-2 hover:text-fg" href={result.mp4_url}>
               Download MP4
             </a>
-            <a className="underline hover:text-white" href={result.srt_url}>
+            <a className="text-saffron underline decoration-saffron/40 underline-offset-2 hover:text-fg" href={result.srt_url}>
               Download SRT
             </a>
             {result.mp4_url.startsWith("stub://") && (
-              <span className="text-neutral-600">
+              <span className="text-faint">
                 (stub URLs — real files once API keys are set)
               </span>
             )}

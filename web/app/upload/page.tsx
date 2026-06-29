@@ -37,22 +37,29 @@ export default function UploadPage() {
 
   if (!ready) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-24 text-neutral-500">Loading…</main>
+      <main className="mx-auto max-w-2xl px-6 py-24 text-faint">Loading…</main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-24">
-      <h1 className="font-display text-4xl font-extrabold">Upload video</h1>
-      <p className="mt-2 text-neutral-400">
-        MP4 / MOV. We extract audio, transcribe with word timestamps, then you
+    <main className="mx-auto max-w-2xl px-6 py-20">
+      <span className="kicker">Step 01 · Upload</span>
+      <h1 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-5xl">
+        Bring your video.
+      </h1>
+      <p className="mt-3 max-w-md text-muted">
+        MP4 / MOV. We extract the audio, transcribe it with word timestamps, then you
         style the captions.
       </p>
 
-      <label className="rise mt-10 flex h-56 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.02] text-neutral-400 transition hover:border-brand-500 hover:bg-brand-500/5 focus-within:ring-2 focus-within:ring-brand-400">
-        <span className="text-3xl">{busy ? "⏳" : "🎬"}</span>
-        <span className="font-medium">{busy ? "Processing…" : "Click to choose a video"}</span>
-        <span className="text-xs text-neutral-600">Devanagari · Roman · Ninglish</span>
+      <label className="rise mt-10 flex h-60 cursor-pointer flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-rule bg-ink-raised text-muted transition hover:border-brand-500/70 hover:bg-brand-700/10 focus-within:ring-2 focus-within:ring-saffron">
+        <span className="font-deva-display text-5xl text-brand-500">{busy ? "…" : "स्व"}</span>
+        <span className="font-display text-lg text-fg">
+          {busy ? "Processing…" : "Click to choose a video"}
+        </span>
+        <span className="text-xs uppercase tracking-[0.16em] text-faint">
+          Devanagari · Roman · Ninglish
+        </span>
         <input
           type="file"
           accept="video/*"
@@ -64,9 +71,9 @@ export default function UploadPage() {
       </label>
 
       {/* Status announced to screen readers. */}
-      <p role="status" aria-live="polite" className="mt-4 text-sm text-neutral-500">
+      <p role="status" aria-live="polite" className="mt-4 text-sm text-muted">
         {busy ? "Uploading and starting transcription…" : ""}
-        {error && <span className="text-red-400">{error}</span>}
+        {error && <span className="text-brand-400">{error}</span>}
       </p>
     </main>
   );

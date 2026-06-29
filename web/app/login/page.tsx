@@ -31,10 +31,11 @@ export default function LoginPage() {
   if (stub) {
     return (
       <main className="mx-auto max-w-sm px-6 py-24">
-        <h1 className="text-2xl font-bold">Sign in</h1>
-        <p className="mt-2 text-neutral-400">
+        <span className="kicker">Demo edition</span>
+        <h1 className="mt-5 font-display text-3xl font-semibold">Sign in</h1>
+        <p className="mt-2 text-muted">
           Auth is disabled (stub mode — no Supabase keys). Go straight to{" "}
-          <a className="underline" href="/upload">
+          <a className="text-saffron underline decoration-saffron/40 underline-offset-2" href="/upload">
             upload
           </a>
           .
@@ -45,8 +46,11 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-sm px-6 py-24">
-      <h1 className="text-2xl font-bold">{mode === "in" ? "Sign in" : "Create account"}</h1>
-      <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3">
+      <span className="kicker">{mode === "in" ? "Welcome back" : "Join the masthead"}</span>
+      <h1 className="mt-5 font-display text-3xl font-semibold tracking-tight">
+        {mode === "in" ? "Sign in" : "Create account"}
+      </h1>
+      <form onSubmit={onSubmit} className="mt-7 flex flex-col gap-3">
         <input
           type="email"
           name="email"
@@ -56,7 +60,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           spellCheck={false}
-          className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          className="rounded-sm border border-rule bg-ink-raised px-3.5 py-2.5 text-fg placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
         />
         <input
           type="password"
@@ -67,24 +71,24 @@ export default function LoginPage() {
           placeholder="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          className="rounded-sm border border-rule bg-ink-raised px-3.5 py-2.5 text-fg placeholder:text-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
         />
         <button
           type="submit"
           disabled={busy}
           aria-busy={busy}
-          className="rounded bg-yellow-400 px-4 py-2 font-semibold text-black disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          className="mt-1 rounded-sm bg-brand-600 px-4 py-2.5 font-semibold text-paper transition hover:bg-brand-500 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
         >
           {busy ? "…" : mode === "in" ? "Sign in" : "Create account"}
         </button>
       </form>
-      <p role="status" aria-live="polite" className="mt-3 text-sm text-red-400">
+      <p role="status" aria-live="polite" className="mt-3 text-sm text-brand-400">
         {error}
       </p>
       <button
         type="button"
         onClick={() => setMode(mode === "in" ? "up" : "in")}
-        className="mt-4 text-sm text-neutral-400 underline"
+        className="mt-5 text-sm text-muted underline decoration-rule underline-offset-4 transition hover:text-saffron"
       >
         {mode === "in" ? "Need an account? Sign up" : "Have an account? Sign in"}
       </button>

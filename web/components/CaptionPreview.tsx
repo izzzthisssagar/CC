@@ -37,8 +37,8 @@ export function CaptionPreview({ words, videoUrl }: { words: Word[]; videoUrl?: 
   const activeIdx = words.findIndex((w) => t >= w.start && t < w.end);
 
   return (
-    <div className="rounded-xl border border-neutral-800 bg-black p-6">
-      <div className="relative aspect-video overflow-hidden rounded-lg bg-neutral-900">
+    <div className="rounded-sm border border-rule bg-ink-sunken p-6">
+      <div className="relative aspect-video overflow-hidden rounded-sm bg-black">
         {videoUrl ? (
           <video
             ref={videoRef}
@@ -48,7 +48,7 @@ export function CaptionPreview({ words, videoUrl }: { words: Word[]; videoUrl?: 
             onTimeUpdate={(e) => setT(e.currentTarget.currentTime)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-neutral-700">
+          <div className="flex h-full w-full items-center justify-center font-display italic text-faint">
             no video — preview simulates timing
           </div>
         )}
@@ -80,7 +80,7 @@ export function CaptionPreview({ words, videoUrl }: { words: Word[]; videoUrl?: 
           <button
             type="button"
             onClick={() => setSimPlaying((p) => !p)}
-            className="rounded bg-yellow-400 px-3 py-1 text-sm font-semibold text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+            className="rounded-sm bg-brand-600 px-3 py-1 text-sm font-semibold text-paper transition hover:bg-brand-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
           >
             {simPlaying ? "Pause" : "Play"}
           </button>
@@ -97,14 +97,14 @@ export function CaptionPreview({ words, videoUrl }: { words: Word[]; videoUrl?: 
             if (videoRef.current) videoRef.current.currentTime = v;
           }}
           aria-label="scrub timeline"
-          className="flex-1 accent-yellow-400"
+          className="flex-1 accent-brand-500"
         />
-        <span className="w-12 text-right text-xs tabular-nums text-neutral-500">
+        <span className="w-12 text-right text-xs tabular-nums text-faint">
           {t.toFixed(1)}s
         </span>
       </div>
 
-      <p className="mt-2 text-xs text-neutral-600">
+      <p className="mt-2 text-xs text-faint">
         {words.length} words · active word highlighted in real time · Devanagari + Latin
         auto per-word.
       </p>

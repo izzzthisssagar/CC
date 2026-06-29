@@ -1,14 +1,33 @@
-/* Design tokens. Brand = crimson (Nepali identity). Generated via ui-design-system,
-   trimmed to what the app uses. Caption colors are functional (high-contrast over
-   video), not brand. */
+/* Editorial Devanagari design tokens.
+   Deep warm ink + cream paper + Nepali crimson + saffron gold. Caption colors stay
+   functional (high-contrast over video), not brand — legibility from the outline. */
 
 :root {
-  /* Brand (crimson). NOTE: white text needs brand-600+ for WCAG AA
-     (brand-500 = 3.84:1, fails normal text; brand-600 = 6.07:1, passes). */
+  /* Surfaces — warm near-black "ink", not flat #000. */
+  --ink: #0c0a09;          /* page */
+  --ink-raised: #15110e;   /* cards / panels */
+  --ink-sunken: #080605;   /* video frame / wells */
+  --paper: #efe6d6;        /* warm cream — inverted editorial blocks */
+
+  /* Text on ink. */
+  --fg: #ece4d6;           /* primary, warm off-white */
+  --muted: #9d9486;        /* secondary */
+  --faint: #6c6357;        /* tertiary / captions-meta */
+  --rule: rgba(236, 228, 214, 0.13);   /* hairline rules */
+
+  /* Brand — Nepali crimson. White/paper text needs brand-600+ for WCAG AA
+     (brand-500 = 3.84:1 fails normal text; brand-600 = 6.07:1 passes). */
   --brand-400: #f26b86;
   --brand-500: #dc526d;
   --brand-600: #b0354d;
   --brand-700: #841e32;
+
+  /* Saffron — secondary editorial accent (kickers, rules, focus). */
+  --saffron: #e0a23a;
+  --saffron-dim: #b9842c;
+
+  /* Focus ring — saffron reads on both ink and crimson. */
+  --ring: var(--saffron);
 
   /* Caption semantics — legibility comes from the outline, not fill-vs-bg. */
   --caption-fill: #ffffff;        /* base word */

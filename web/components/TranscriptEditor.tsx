@@ -148,34 +148,34 @@ export function TranscriptEditor({
     }
   }
 
-  if (!ready) return <p className="mt-4 text-sm text-neutral-500">Loading…</p>;
+  if (!ready) return <p className="mt-4 text-sm text-faint">Loading…</p>;
 
   return (
     <>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-2 text-sm text-muted">
         Word-level transcript ({source === "saved" ? "saved" : source === "worker" ? "from worker" : "mock — worker offline"}).
         Edit a word to correct it, pick a style, preview, export.
       </p>
 
       {/* STT engine + language toggle (real Nepali is hard — let users try both) */}
-      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+      <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
         <label className="flex items-center gap-2">
-          <span className="text-neutral-500">Engine</span>
+          <span className="text-xs uppercase tracking-[0.14em] text-faint">Engine</span>
           <select
             value={provider}
             onChange={(e) => setProvider(e.target.value)}
-            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+            className="rounded-sm border border-rule bg-ink-raised px-2 py-1 text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
           >
             <option value="groq">Groq Whisper</option>
             <option value="gladia">Gladia</option>
           </select>
         </label>
         <label className="flex items-center gap-2">
-          <span className="text-neutral-500">Language</span>
+          <span className="text-xs uppercase tracking-[0.14em] text-faint">Language</span>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+            className="rounded-sm border border-rule bg-ink-raised px-2 py-1 text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
           >
             <option value="">Auto (Ninglish)</option>
             <option value="ne">Force Nepali</option>
@@ -186,7 +186,7 @@ export function TranscriptEditor({
           onClick={reTranscribe}
           disabled={retranscribing}
           aria-busy={retranscribing}
-          className="rounded bg-neutral-200 px-3 py-1 font-semibold text-black disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          className="rounded-sm bg-paper px-3 py-1 font-semibold text-ink transition hover:bg-paper/90 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
         >
           {retranscribing ? "Transcribing…" : "Re-transcribe"}
         </button>
@@ -195,10 +195,8 @@ export function TranscriptEditor({
         <div className="flex flex-col gap-4">
           <CaptionPreview words={words} videoUrl={videoUrl} />
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-              Transcript — edit to correct
-            </h2>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <h2 className="kicker">Transcript — edit to correct</h2>
+            <div className="mt-4 flex flex-wrap gap-2">
               {words.map((w, i) => (
                 <input
                   key={i}
@@ -206,7 +204,7 @@ export function TranscriptEditor({
                   aria-label={`word ${i + 1}`}
                   spellCheck={false}
                   onBlur={(e) => onWordEdit(i, e.target.value)}
-                  className="w-24 rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+                  className="w-24 rounded-sm border border-rule bg-ink-raised px-2 py-1 text-sm text-fg focus-visible:border-brand-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                 />
               ))}
             </div>
