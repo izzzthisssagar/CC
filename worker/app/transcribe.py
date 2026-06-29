@@ -57,8 +57,12 @@ def transcribe_audio(video_url: str, stub: bool = False) -> tuple[list[dict], st
             prompt=NINGLISH_PROMPT,
         )
 
+    # Groq returns words as dicts (some lib versions as objects) — handle both.
+    def field(w, k):
+        return w[k] if isinstance(w, dict) else getattr(w, k)
+
     words = [
-        {"word": w.word, "start": w.start, "end": w.end}
+        {"word": field(w, "word"), "start": field(w, "start"), "end": field(w, "end")}
         for w in (res.words or [])
     ]
     language = getattr(res, "language", "ne")
