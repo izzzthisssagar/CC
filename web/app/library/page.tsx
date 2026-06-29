@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRequireAuth } from "@/components/AuthProvider";
-import { listVideos, videoPublicUrl, type VideoRow } from "@/lib/videos";
+import { listVideos, videoPublicUrl, deleteVideo, type VideoRow } from "@/lib/videos";
 
 export default function LibraryPage() {
   const { ready } = useRequireAuth();
   const [videos, setVideos] = useState<VideoRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     listVideos().then((v) => {
@@ -16,6 +17,16 @@ export default function LibraryPage() {
       setLoading(false);
     });
   }, []);
+
+  async function onDelete(v: VideoRow) {
+    setVideos((vs) => vs.filter((x) => x.id !== v.id)); // optimistic
+    setConfirmId(null);
+    try {
+      await deleteVideo(v.id, v.storage_path);
+    } catch {
+      listVideos().then(setVideos); // restore on failure
+    }
+  }
 
   if (!ready) return <main className="mx-auto max-w-3xl px-6 py-24 text-neutral-500">Loading…</main>;
 
@@ -54,12 +65,41 @@ export default function LibraryPage() {
                     {v.status} · {new Date(v.created_at).toLocaleDateString()}
                   </p>
                 </div>
-                <Link
-                  href={href}
-                  className="ml-4 shrink-0 rounded border border-neutral-700 px-3 py-1 text-sm hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
-                >
-                  Open
-                </Link>
+                <div className="ml-4 flex shrink-0 items-center gap-2">
+                  <Link
+                    href={href}
+                    className="rounded border border-neutral-700 px-3 py-1 text-sm hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+                  >
+                    Open
+                  </Link>
+                  {confirmId === v.id ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => onDelete(v)}
+                        className="rounded bg-red-500 px-2 py-1 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmId(null)}
+                        className="rounded px-2 py-1 text-sm text-neutral-400 hover:bg-neutral-900"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmId(v.id)}
+                      aria-label={`Delete ${name}`}
+                      className="rounded border border-neutral-800 px-2 py-1 text-sm text-neutral-500 hover:border-red-500 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </li>
             );
           })}
