@@ -52,3 +52,7 @@ pain is real and frequent before building.**
 
 → Next: run the 15 interviews, code observations, run `insight_synthesizer.py --min-sources 3`.
 Only themes recurring across ≥3 participants become real persona facts.
+
+**See also:** `UX-JOURNEY-FUTURE.md` (the journey *through the built product*, not the old
+CapCut workflow) and `USABILITY-TEST-PLAN.md` (the study that confirms/kills the
+`[ASSUMPTION]` emotions in both maps and validates the Editorial Devanagari redesign).
