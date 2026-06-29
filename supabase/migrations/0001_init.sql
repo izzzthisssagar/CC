@@ -38,7 +38,9 @@ create table if not exists public.transcripts (
 -- This is the AI moat; populate from Phase 1 day one.
 create table if not exists public.corrections (
     id            uuid primary key default gen_random_uuid(),
-    transcript_id uuid not null references public.transcripts (id) on delete cascade,
+    -- nullable: corrections are captured (as training data) even before a
+    -- transcript row is persisted. Link back when the full pipeline writes transcripts.
+    transcript_id uuid references public.transcripts (id) on delete set null,
     word_index    int  not null,             -- position in words[]
     original_text text not null,
     corrected_text text not null,
@@ -87,3 +89,14 @@ alter table public.transcripts     enable row level security;
 alter table public.corrections     enable row level security;
 alter table public.jobs            enable row level security;
 alter table public.transcript_chunks enable row level security;
+
+-- MVP storage policies for the `videos` bucket so the browser can upload + the
+-- public URL is readable. PERMISSIVE for MVP — tighten to auth.uid()-scoped paths
+-- once auth lands (Phase 1).
+drop policy if exists "videos public read" on storage.objects;
+create policy "videos public read" on storage.objects
+    for select using (bucket_id = 'videos');
+
+drop policy if exists "videos anon upload" on storage.objects;
+create policy "videos anon upload" on storage.objects
+    for insert with check (bucket_id = 'videos');
