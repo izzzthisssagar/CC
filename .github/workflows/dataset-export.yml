@@ -1,0 +1,47 @@
+name: Dataset export
+
+# Scheduled correction-loop → Whisper fine-tune snapshot. Pulls corrections from
+# Supabase, isolates each corrected word's audio, runs the validated transform, and
+# uploads a date-versioned JSONL (+ latest.jsonl) to the `datasets` storage bucket.
+# The fine-tune job (Phase 4) reads datasets/latest.jsonl. See docs/DATA.md.
+#
+# Requires repo secrets: SUPABASE_URL, SUPABASE_SERVICE_KEY.
+# No-op-safe: with no corrections it uploads an empty snapshot and exits 0.
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # 03:00 UTC every Monday
+  workflow_dispatch:
+    inputs:
+      no_clips:
+        description: "Skip audio isolation (text-only, faster)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: dataset-export
+  cancel-in-progress: false
+
+jobs:
+  export:
+    name: export corrections → JSONL
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: worker/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Install ffmpeg (audio isolation)
+        if: ${{ inputs.no_clips != true }}
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Export + upload snapshot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python -m scripts.export_dataset --upload ${{ inputs.no_clips && '--no-clips' || '' }}

@@ -1,4 +1,7 @@
+from datetime import date
+
 from app.training_export import validate_correction, corrections_to_jsonl
+from scripts.export_dataset import dataset_key
 
 
 def _good(**over):
@@ -38,3 +41,9 @@ def test_transform_dedupes_and_emits_whisper_records():
     ]
     reasons = sorted(r.reason for r in rejected)
     assert reasons == ["duplicate (audio, text) pair", "no-op correction (corrected == original)"]
+
+
+def test_dataset_key_is_date_and_size_versioned():
+    assert dataset_key(date(2026, 6, 29), 42) == "train_2026-06-29_42.jsonl"
+    # distinct days / sizes never collide
+    assert dataset_key(date(2026, 6, 30), 42) != dataset_key(date(2026, 6, 29), 42)

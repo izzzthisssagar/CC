@@ -17,16 +17,25 @@ import argparse
 import json
 import os
 import sys
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.training_export import corrections_to_jsonl  # noqa: E402
+
+# Storage bucket that accumulates the versioned fine-tune snapshots.
+DATASET_BUCKET = "datasets"
 
 
 def _sb():
     url = os.environ["SUPABASE_URL"].rstrip("/")
     key = os.environ["SUPABASE_SERVICE_KEY"]
     return url, key
+
+
+def dataset_key(today: date, n_records: int) -> str:
+    """Date- + size-versioned object key for a snapshot (pure; testable)."""
+    return f"train_{today.isoformat()}_{n_records}.jsonl"
 
 
 def fetch_corrections() -> list[dict]:
@@ -53,19 +62,27 @@ def _video_url(row: dict) -> str | None:
     return f"{url}/storage/v1/object/public/videos/{sp}" if sp else None
 
 
-def _upload_clip(local_path: str, key: str) -> str:
+def _upload_object(bucket: str, key: str, content: bytes, content_type: str) -> str:
     import httpx
 
     url, skey = _sb()
-    data = Path(local_path).read_bytes()
     r = httpx.post(
-        f"{url}/storage/v1/object/clips/{key}",
-        headers={"apikey": skey, "Authorization": f"Bearer {skey}", "content-type": "audio/wav", "x-upsert": "true"},
-        content=data,
+        f"{url}/storage/v1/object/{bucket}/{key}",
+        headers={
+            "apikey": skey,
+            "Authorization": f"Bearer {skey}",
+            "content-type": content_type,
+            "x-upsert": "true",
+        },
+        content=content,
         timeout=60,
     )
     r.raise_for_status()
-    return f"clips/{key}"
+    return f"{bucket}/{key}"
+
+
+def _upload_clip(local_path: str, key: str) -> str:
+    return _upload_object("clips", key, Path(local_path).read_bytes(), "audio/wav")
 
 
 def isolate_clips(rows: list[dict]) -> int:
@@ -95,6 +112,11 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Export corrections → Whisper fine-tune JSONL")
     p.add_argument("--out", default=None)
     p.add_argument("--no-clips", action="store_true", help="skip audio isolation (text only)")
+    p.add_argument(
+        "--upload",
+        action="store_true",
+        help=f"upload the snapshot to the `{DATASET_BUCKET}` bucket (date-versioned + latest.jsonl)",
+    )
     args = p.parse_args(argv)
 
     if not os.getenv("SUPABASE_URL") or not os.getenv("SUPABASE_SERVICE_KEY"):
@@ -107,13 +129,22 @@ def main(argv: list[str] | None = None) -> int:
 
     out = Path(args.out) if args.out else Path("datasets") / f"train_{len(records)}.jsonl"
     out.parent.mkdir(parents=True, exist_ok=True)
-    with out.open("w", encoding="utf-8") as f:
-        for rec in records:
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    body = "".join(json.dumps(rec, ensure_ascii=False) + "\n" for rec in records)
+    out.write_text(body, encoding="utf-8")
 
     print(f"corrections pulled : {len(corrections)}")
     print(f"clips isolated     : {made}")
     print(f"training-ready     : {len(records)} → {out}")
+
+    if args.upload:
+        # Date-versioned snapshot (the accruing history) + a stable `latest.jsonl`
+        # pointer that the fine-tune job always reads.
+        blob = body.encode("utf-8")
+        key = dataset_key(date.today(), len(records))
+        _upload_object(DATASET_BUCKET, key, blob, "application/jsonl")
+        _upload_object(DATASET_BUCKET, "latest.jsonl", blob, "application/jsonl")
+        print(f"uploaded           : {DATASET_BUCKET}/{key}  (+ latest.jsonl)")
+
     print(f"rejected           : {len(rejected)}")
     reasons: dict[str, int] = {}
     for rj in rejected:

@@ -70,7 +70,17 @@ source video via `app/clips.extract_segment` (SSRF-guarded, 16kHz mono wav), upl
 to the private `clips` bucket, and emits real `{audio, text}` pairs. Verified live end to
 end: a correction → 0.7s clip → trainable JSONL, 0 rejected.
 
+## Scheduled export — BUILT (Phase 4)
+
+`.github/workflows/dataset-export.yml` runs the export on a weekly cron (Mon 03:00 UTC,
+plus manual `workflow_dispatch`). It calls `export_dataset.py --upload`, which uploads the
+snapshot to the `datasets` storage bucket under a date+size-versioned key
+(`train_<YYYY-MM-DD>_<n>.jsonl`) **and** overwrites a stable `latest.jsonl` pointer that the
+fine-tune job reads. Needs repo secrets `SUPABASE_URL` + `SUPABASE_SERVICE_KEY`; no-op-safe
+(empty snapshot → exit 0). `dataset_key()` is unit-tested.
+
 ## Remaining (post-MVP)
 
-- Scheduled cadence (Supabase cron / GH Action) to run the export on a timer.
-- Snapshot manifest / dataset versioning; the first Whisper fine-tune run (Phase 3).
+- Snapshot manifest (row counts, source video ids) alongside `latest.jsonl`.
+- The first Whisper fine-tune run (Phase 4) — pipeline + WER eval already built
+  (`worker/training/`), gated on data volume + a GPU.
