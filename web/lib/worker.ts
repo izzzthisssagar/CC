@@ -39,8 +39,15 @@ export async function pollJob(
   throw new Error("job timed out");
 }
 
-export async function transcribe(videoUrl: string): Promise<{ words: Word[]; language: string }> {
-  const jobId = await submit("/transcribe", { video_url: videoUrl });
+export async function transcribe(
+  videoUrl: string,
+  opts: { provider?: string; language?: string } = {}
+): Promise<{ words: Word[]; language: string }> {
+  const jobId = await submit("/transcribe", {
+    video_url: videoUrl,
+    provider: opts.provider,
+    language: opts.language,
+  });
   const result = await pollJob(jobId);
   return result as { words: Word[]; language: string };
 }

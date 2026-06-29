@@ -26,6 +26,8 @@ class TranscribeRequest(BaseModel):
     # pure-Nepali audio in Devanagari (Whisper auto often flips to English mode), but
     # can hurt Ninglish/code-switching — leave None for mixed content.
     language: str | None = None
+    # STT engine: "groq" (default) | "gladia". None = STT_PROVIDER env default.
+    provider: str | None = None
 
 
 class TranscribeResponse(BaseModel):

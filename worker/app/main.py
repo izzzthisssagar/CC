@@ -46,7 +46,9 @@ def transcribe(req: TranscribeRequest, bg: BackgroundTasks) -> JobAccepted:
     job = create_job("transcribe")
 
     def work():
-        words, language = transcribe_audio(req.video_url, stub=STUB_MODE, language=req.language)
+        words, language = transcribe_audio(
+            req.video_url, stub=STUB_MODE, language=req.language, provider=req.provider
+        )
         return {"words": words, "language": language, "stub": STUB_MODE}
 
     bg.add_task(run_job, job.id, work)

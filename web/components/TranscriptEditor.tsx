@@ -30,7 +30,44 @@ export function TranscriptEditor({
   const [words, setWords] = useState<Word[]>(MOCK_WORDS);
   const [source, setSource] = useState<"mock" | "worker" | "saved">("mock");
   const [transcriptId, setTranscriptId] = useState<string | null>(null);
+  const [provider, setProvider] = useState("groq");
+  const [language, setLanguage] = useState(""); // "" = auto, "ne" = force Nepali
+  const [retranscribing, setRetranscribing] = useState(false);
   const persistable = videoId !== "demo"; // real uploaded video
+
+  // Re-run STT with the chosen engine + language, replace words, persist.
+  async function reTranscribe() {
+    setRetranscribing(true);
+    try {
+      const res = await fetch("/api/transcribe", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          video_url: videoUrl ?? `stub://${videoId}`,
+          provider,
+          language: language || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error(`transcribe ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data.words) && data.words.length) {
+        setWords(data.words);
+        setSource("worker");
+        if (persistable) {
+          try {
+            const tid = await saveTranscript(videoId, data.words, data.language ?? null);
+            if (tid) setTranscriptId(tid);
+          } catch {
+            /* best-effort */
+          }
+        }
+      }
+    } catch {
+      /* keep current words */
+    } finally {
+      setRetranscribing(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -115,6 +152,41 @@ export function TranscriptEditor({
         Word-level transcript ({source === "saved" ? "saved" : source === "worker" ? "from worker" : "mock — worker offline"}).
         Edit a word to correct it, pick a style, preview, export.
       </p>
+
+      {/* STT engine + language toggle (real Nepali is hard — let users try both) */}
+      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+        <label className="flex items-center gap-2">
+          <span className="text-neutral-500">Engine</span>
+          <select
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
+            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          >
+            <option value="groq">Groq Whisper</option>
+            <option value="gladia">Gladia</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-2">
+          <span className="text-neutral-500">Language</span>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          >
+            <option value="">Auto (Ninglish)</option>
+            <option value="ne">Force Nepali</option>
+          </select>
+        </label>
+        <button
+          type="button"
+          onClick={reTranscribe}
+          disabled={retranscribing}
+          aria-busy={retranscribing}
+          className="rounded bg-neutral-200 px-3 py-1 font-semibold text-black disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+        >
+          {retranscribing ? "Transcribing…" : "Re-transcribe"}
+        </button>
+      </div>
       <div className="mt-8 grid gap-8 md:grid-cols-[1fr_280px]">
         <div className="flex flex-col gap-4">
           <CaptionPreview words={words} videoUrl={videoUrl} />

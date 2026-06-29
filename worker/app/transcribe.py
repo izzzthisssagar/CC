@@ -40,11 +40,15 @@ def _extract_audio(video_url: str) -> str:
 
 
 def transcribe_audio(
-    video_url: str, stub: bool = False, language: str | None = None
+    video_url: str,
+    stub: bool = False,
+    language: str | None = None,
+    provider: str | None = None,
 ) -> tuple[list[dict], str]:
     """Return (words, language). words = [{word, start, end}, ...].
 
     language: optional ISO hint (e.g. "ne"). None = auto-detect.
+    provider: "groq" | "gladia". None = STT_PROVIDER env default.
     """
     if stub:
         return _STUB_WORDS, "ne"
@@ -52,5 +56,4 @@ def transcribe_audio(
     from .stt import transcribe as stt_transcribe
 
     audio_path = _extract_audio(video_url)
-    # provider chosen by STT_PROVIDER env (default groq); see app/stt.py.
-    return stt_transcribe(audio_path, language=language)
+    return stt_transcribe(audio_path, provider=provider, language=language)
