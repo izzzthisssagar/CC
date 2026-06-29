@@ -52,3 +52,5 @@ graphify-out/
 # generated training datasets
 datasets/
 worker/datasets/
+
+seed-starters/
