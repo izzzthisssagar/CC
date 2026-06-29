@@ -1,4 +1,4 @@
-fastapi==0.115.6
+fastapi==0.138.1
 uvicorn[standard]==0.34.0
 groq==0.13.1
 pysubs2==1.7.3
