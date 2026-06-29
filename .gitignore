@@ -48,3 +48,7 @@ CLAUDE.md
 
 # graphify analysis output (local)
 graphify-out/
+
+# generated training datasets
+datasets/
+worker/datasets/
