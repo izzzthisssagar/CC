@@ -1,0 +1,10 @@
+# GPU fine-tuning deps — install ONLY in the training env (not the worker/CI).
+# A CUDA GPU is required. See docs/FINETUNE.md.
+torch>=2.2
+transformers>=4.44
+datasets>=2.20
+accelerate>=0.33
+evaluate>=0.4
+jiwer>=3.0
+librosa>=0.10
+soundfile>=0.12
