@@ -72,10 +72,27 @@ Rule of thumb: hundreds of pairs minimum to move WER; thousands to win decisivel
 
 ## 2. Train (needs a CUDA GPU — NOT the worker/CI env)
 
-Where to run (cheapest → most control):
-- **Google Colab** (free T4 / Pro A100) — fastest start for `whisper-small`.
+### Easiest + free: the turnkey notebook
+`worker/training/colab_finetune_nepali.ipynb` runs the whole thing on a **free Colab/Kaggle
+T4** — it downloads OpenSLR SLR54, builds the dataset, fine-tunes `whisper-small`, and prints
+WER (base vs fine-tuned). Self-contained: no repo, no keys.
+
+1. Open https://colab.research.google.com → **File → Upload notebook** → pick the `.ipynb`.
+   (Kaggle: **+ New Notebook → File → Import** the `.ipynb`.)
+2. **Runtime → Change runtime type → T4 GPU** (Kaggle: Accelerator → GPU T4).
+3. **Runtime → Run all.** Tune `N_TRAIN` / `PARTS` / `EPOCHS` in the config cell.
+4. Last cell zips/downloads the model (or push to the free HF Hub).
+
+A first pass (`N_TRAIN=3000`, 3 epochs) ≈ 1–2 h on a free T4 and should already beat base
+Whisper on Nepali. The free tier disconnects on idle/after ~12 h — keep the tab active and
+start small; scale up once you see WER drop.
+
+### Other options (cheapest → most control)
+- **Google Colab Pro** (A100) — same notebook, faster / bigger models.
 - **Modal** (`modal run`, A10G/A100, ~$1–3/hr, pay-per-use) — matches blueprint stack.
 - **Hetzner GPU VPS** — own the box; blueprint's Phase-2+ self-host target.
+
+### Or the plain script (any CUDA box)
 
 ```bash
 pip install -r worker/training/requirements-train.txt
