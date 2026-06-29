@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+type Word = { word: string; start: number; end: number };
+
 // Caption templates from BLUEPRINT.md §8.
 const TEMPLATES = [
   "Devanagari Bold",
@@ -15,17 +17,43 @@ const TEMPLATES = [
 const focusRing =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black";
 
-export function StylePicker() {
+type ExportResult = { mp4_url: string; srt_url: string };
+
+export function StylePicker({
+  words,
+  videoId,
+  videoUrl,
+}: {
+  words: Word[];
+  videoId: string;
+  videoUrl?: string;
+}) {
   const [template, setTemplate] = useState(TEMPLATES[0]);
-  const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<ExportResult | null>(null);
 
   async function onExport() {
     setBusy(true);
-    setStatus(`Exporting "${template}"…`);
-    // Scaffold: POST /api/export → worker /export, then poll the job.
-    setStatus(`"${template}" export wires to the worker once keys are set.`);
-    setBusy(false);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await fetch("/api/export", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          video_url: videoUrl ?? `stub://${videoId}`,
+          words,
+          style: { template },
+        }),
+      });
+      if (!res.ok) throw new Error(`export failed (${res.status})`);
+      setResult((await res.json()) as ExportResult);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -61,9 +89,24 @@ export function StylePicker() {
         {busy ? "Exporting…" : "Export MP4 + SRT"}
       </button>
 
-      <p role="status" aria-live="polite" className="mt-3 text-xs text-neutral-500">
-        {status}
-      </p>
+      <div role="status" aria-live="polite" className="mt-3 text-xs">
+        {error && <p className="text-red-400">{error}</p>}
+        {result && (
+          <div className="flex flex-col gap-1 text-neutral-300">
+            <a className="underline hover:text-white" href={result.mp4_url}>
+              Download MP4
+            </a>
+            <a className="underline hover:text-white" href={result.srt_url}>
+              Download SRT
+            </a>
+            {result.mp4_url.startsWith("stub://") && (
+              <span className="text-neutral-600">
+                (stub URLs — real files once API keys are set)
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

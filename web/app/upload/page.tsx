@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { uploadVideo } from "@/lib/storage";
 
 type Phase = "idle" | "uploading" | "error";
 
@@ -16,11 +17,14 @@ export default function UploadPage() {
     setPhase("uploading");
     setError(null);
     try {
-      // Scaffold: real flow = upload to Supabase Storage, create `videos` row,
-      // POST /api/transcribe (worker returns a job_id), then route to the editor
-      // which polls the job. For now jump to the stub editor.
-      const id = "demo";
-      router.push(`/editor/${id}`);
+      // Live: upload to Supabase Storage, then open the editor with the real URL
+      // (editor fires /api/transcribe). Stub mode (no Supabase) → demo editor.
+      const result = await uploadVideo(file);
+      if (result) {
+        router.push(`/editor/${result.id}?src=${encodeURIComponent(result.url)}`);
+      } else {
+        router.push(`/editor/demo`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
       setPhase("error");
