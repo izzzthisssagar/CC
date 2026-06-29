@@ -62,10 +62,15 @@ user fixes word in editor
   `corrections_to_jsonl` → versioned `train_<n>.jsonl` of `{audio, text}` pairs; reports
   rejected rows with reasons. Verified live.
 
-## Remaining feeder (the real prerequisite)
+## Per-word audio isolation — BUILT
 
-- **Per-word audio isolation.** A correction is training-ready only when `audio_clip_path`
-  is set. Next step: at correction time, the worker extracts the word's audio segment
-  (`start_s..end_s`) from the source video, uploads it to Storage, and stores the path.
-  Until then the exporter correctly rejects audio-less corrections ("missing audio_clip_path").
-- Scheduled cadence (Supabase cron / GH Action) + snapshot manifest.
+The export job (`export_dataset.py`) now joins corrections → transcripts → videos,
+extracts each corrected word's audio segment (`start_s..end_s`, +0.05s pad) from the
+source video via `app/clips.extract_segment` (SSRF-guarded, 16kHz mono wav), uploads it
+to the private `clips` bucket, and emits real `{audio, text}` pairs. Verified live end to
+end: a correction → 0.7s clip → trainable JSONL, 0 rejected.
+
+## Remaining (post-MVP)
+
+- Scheduled cadence (Supabase cron / GH Action) to run the export on a timer.
+- Snapshot manifest / dataset versioning; the first Whisper fine-tune run (Phase 3).
