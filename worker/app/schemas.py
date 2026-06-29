@@ -22,6 +22,10 @@ class Style(BaseModel):
 
 class TranscribeRequest(BaseModel):
     video_url: str = Field(..., description="Supabase Storage URL or local path")
+    # Optional ISO hint (e.g. "ne"). Default None = auto-detect. Forcing "ne" keeps
+    # pure-Nepali audio in Devanagari (Whisper auto often flips to English mode), but
+    # can hurt Ninglish/code-switching — leave None for mixed content.
+    language: str | None = None
 
 
 class TranscribeResponse(BaseModel):

@@ -39,8 +39,13 @@ def _extract_audio(video_url: str) -> str:
     return out
 
 
-def transcribe_audio(video_url: str, stub: bool = False) -> tuple[list[dict], str]:
-    """Return (words, language). words = [{word, start, end}, ...]."""
+def transcribe_audio(
+    video_url: str, stub: bool = False, language: str | None = None
+) -> tuple[list[dict], str]:
+    """Return (words, language). words = [{word, start, end}, ...].
+
+    language: optional ISO hint (e.g. "ne"). None = auto-detect.
+    """
     if stub:
         return _STUB_WORDS, "ne"
 
@@ -48,6 +53,7 @@ def transcribe_audio(video_url: str, stub: bool = False) -> tuple[list[dict], st
 
     audio_path = _extract_audio(video_url)
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    kwargs = {"language": language} if language else {}
     with open(audio_path, "rb") as f:
         res = client.audio.transcriptions.create(
             file=f,
@@ -55,6 +61,7 @@ def transcribe_audio(video_url: str, stub: bool = False) -> tuple[list[dict], st
             response_format="verbose_json",
             timestamp_granularities=["word"],
             prompt=NINGLISH_PROMPT,
+            **kwargs,
         )
 
     # Groq returns words as dicts (some lib versions as objects) — handle both.
