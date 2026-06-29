@@ -41,3 +41,7 @@ fonts/*.woff2
 .idea/
 .vscode/
 *.swp
+
+# local tooling (not published)
+CLAUDE.md
+.claude/
