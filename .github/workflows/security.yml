@@ -9,9 +9,11 @@ jobs:
   secret-scan:
     name: secret scan (gitleaks)
     runs-on: ubuntu-latest
+    # gitleaks-action can't get a token on Dependabot PRs → skip (avoids false red).
+    if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
