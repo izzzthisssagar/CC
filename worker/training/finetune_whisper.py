@@ -99,7 +99,7 @@ def main() -> int:
         args=targs,
         train_dataset=ds,
         data_collator=Collator(processor),
-        tokenizer=processor.feature_extractor,
+        processing_class=processor.feature_extractor,  # transformers v5: renamed from tokenizer=
     )
     trainer.train()
     trainer.save_model(args.out)
