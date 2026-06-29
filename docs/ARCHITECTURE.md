@@ -2,6 +2,32 @@
 
 Simplified Phase-1 pipeline. No Inngest, no Modal, no R2 — Supabase + local FastAPI worker.
 
+## System diagram
+
+```mermaid
+flowchart TD
+    U[Browser - Next.js client] -->|1. upload file| ST[(Supabase Storage<br/>videos bucket)]
+    U -->|2. POST /api/transcribe| NX[Next.js API routes<br/>same-origin proxy]
+    U -->|edit word → POST /api/corrections| NX
+    U -->|export → POST /api/export| NX
+
+    NX -->|submit + poll job| W[FastAPI worker<br/>job-based async]
+    NX -->|service key insert| DB[(Supabase Postgres<br/>+ RLS + pgvector)]
+
+    W -->|SSRF guard → ffmpeg download| ST
+    W -->|word-level timestamps<br/>Ninglish-primed| G[Groq Whisper<br/>large-v3-turbo]
+    W -->|pysubs2 .ass → libass burn-in| FF[FFmpeg]
+
+    DB -.->|corrections| TR[training_export<br/>→ Whisper fine-tune]
+
+    classDef ext fill:#841e32,color:#fff;
+    class G,ST,DB ext;
+```
+
+Stub mode: when `GROQ_API_KEY` / Supabase env are absent, the worker returns mock words
+and routes degrade gracefully — the whole flow runs offline.
+
+
 ## Data flow
 
 ```
