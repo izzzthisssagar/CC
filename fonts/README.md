@@ -19,6 +19,16 @@ All from Google Fonts (open license):
 | Inter | Latin partner (Ninglish) | fonts.google.com/specimen/Inter |
 
 After adding, you should have e.g. `fonts/Matangi-VariableFont_wght.ttf`.
+(`fonts/Matangi.ttf` — the variable font — has been added locally; it's gitignored,
+so re-download with: `curl -sL "https://github.com/google/fonts/raw/main/ofl/matangi/Matangi%5Bwght%5D.ttf" -o fonts/Matangi.ttf`.)
+
+## ⚠️ FFmpeg must have libass
+
+Burn-in uses FFmpeg's `subtitles` filter → **libass**. Verify: `ffmpeg -filters | grep subtitles`.
+- **Docker worker:** Debian's apt `ffmpeg` includes libass — works out of the box (`worker/Dockerfile`).
+- **macOS local:** the regular `brew install ffmpeg` bottle ships **without** libass. For local
+  burn-in install `brew install homebrew-ffmpeg/ffmpeg/ffmpeg-full`, or run the Docker worker.
+- Transcription (audio extract) does NOT need libass — only burn-in/export does.
 
 ## Subset for web (mandatory before shipping to browser)
 
