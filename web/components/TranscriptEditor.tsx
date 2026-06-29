@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CaptionPreview } from "./CaptionPreview";
 import { StylePicker } from "./StylePicker";
+import { ChatPanel } from "./ChatPanel";
 import { useRequireAuth } from "./AuthProvider";
 import { loadTranscript, saveTranscript } from "@/lib/transcripts";
 
@@ -210,6 +211,7 @@ export function TranscriptEditor({
         </div>
         <StylePicker words={words} videoId={videoId} videoUrl={videoUrl} />
       </div>
+      <ChatPanel words={words} />
     </>
   );
 }

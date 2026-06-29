@@ -16,10 +16,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .transcribe import transcribe_audio
 from .export import burn_in
+from .chat import answer as chat_answer
 from .jobs import create_job, get_job, run_job
 from .schemas import (
     TranscribeRequest,
     ExportRequest,
+    ChatRequest,
+    ChatResponse,
     JobAccepted,
     JobState,
 )
@@ -70,6 +73,12 @@ def export(req: ExportRequest, bg: BackgroundTasks) -> JobAccepted:
 
     bg.add_task(run_job, job.id, work)
     return JobAccepted(job_id=job.id)
+
+
+@app.post("/chat", response_model=ChatResponse)
+def chat(req: ChatRequest) -> ChatResponse:
+    """Answer a question about a video from its transcript (sync — fast LLM call)."""
+    return ChatResponse(answer=chat_answer(req.transcript, req.question, stub=STUB_MODE), stub=STUB_MODE)
 
 
 @app.get("/jobs/{job_id}", response_model=JobState)

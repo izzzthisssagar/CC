@@ -48,6 +48,16 @@ class ExportResponse(BaseModel):
     stub: bool = False
 
 
+class ChatRequest(BaseModel):
+    transcript: str
+    question: str
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    stub: bool = False
+
+
 class JobAccepted(BaseModel):
     """202 response — work runs in the background, poll GET /jobs/{id}."""
     job_id: str
