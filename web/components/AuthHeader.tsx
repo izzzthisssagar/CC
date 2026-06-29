@@ -11,6 +11,12 @@ export function AuthHeader() {
     <header className="flex items-center justify-end gap-4 border-b border-neutral-900 px-6 py-2 text-sm">
       {email ? (
         <>
+          <Link
+            href="/library"
+            className="text-neutral-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          >
+            Library
+          </Link>
           <span className="text-neutral-400">{email}</span>
           <button
             type="button"
