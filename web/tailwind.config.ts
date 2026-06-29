@@ -11,6 +11,7 @@ const config: Config = {
         // Loaded via next/font (app/fonts.ts) → CSS variables, zero CLS.
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         deva: ["var(--font-deva)", "Noto Sans Devanagari", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-sans)", "sans-serif"],
       },
       colors: {
         // Tokens from app/tokens.css. Use brand-600+ with white text (AA).

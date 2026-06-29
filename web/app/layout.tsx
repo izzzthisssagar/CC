@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { inter, mukta } from "./fonts";
+import { inter, mukta, display } from "./fonts";
 import { AuthProvider } from "@/components/AuthProvider";
 import { AuthHeader } from "@/components/AuthHeader";
 
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ne" className={`${inter.variable} ${mukta.variable}`}>
+    <html lang="ne" className={`${inter.variable} ${mukta.variable} ${display.variable}`}>
       <body className="min-h-screen font-sans antialiased">
         <a
           href="#main"

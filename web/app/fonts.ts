@@ -2,12 +2,19 @@
 // no FOUT, no render-blocking request to Google. Devanagari MUST be a real loaded
 // font, not an OS fallback (fallbacks mangle conjuncts/matras).
 
-import { Inter, Mukta } from "next/font/google";
+import { Inter, Mukta, Bricolage_Grotesque } from "next/font/google";
 
 // Latin partner (Ninglish + English words).
 export const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+// Distinctive display face for headlines — characterful, not generic.
+export const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
   display: "swap",
 });
 

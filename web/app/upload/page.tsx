@@ -43,14 +43,16 @@ export default function UploadPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
-      <h1 className="text-3xl font-bold">Upload video</h1>
+      <h1 className="font-display text-4xl font-extrabold">Upload video</h1>
       <p className="mt-2 text-neutral-400">
         MP4 / MOV. We extract audio, transcribe with word timestamps, then you
         style the captions.
       </p>
 
-      <label className="mt-10 flex h-48 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-neutral-700 text-neutral-400 hover:border-yellow-400 focus-within:ring-2 focus-within:ring-yellow-400">
-        <span>{busy ? "Processing…" : "Click to choose a video"}</span>
+      <label className="rise mt-10 flex h-56 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.02] text-neutral-400 transition hover:border-brand-500 hover:bg-brand-500/5 focus-within:ring-2 focus-within:ring-brand-400">
+        <span className="text-3xl">{busy ? "⏳" : "🎬"}</span>
+        <span className="font-medium">{busy ? "Processing…" : "Click to choose a video"}</span>
+        <span className="text-xs text-neutral-600">Devanagari · Roman · Ninglish</span>
         <input
           type="file"
           accept="video/*"

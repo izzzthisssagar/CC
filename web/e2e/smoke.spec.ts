@@ -5,10 +5,10 @@ import { test, expect } from "@playwright/test";
 // (which emitted invalid `toHaveURL(///)` for the root route).
 
 test.describe("landing", () => {
-  test("loads and shows the hero + upload CTA", async ({ page }) => {
+  test("loads and shows the hero + start CTA", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/Nepali AI Caption/);
-    await expect(page.getByRole("link", { name: /upload video/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /start captioning/i })).toBeVisible();
   });
 });
 
