@@ -1,7 +1,7 @@
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 groq==0.13.1
-pysubs2==1.7.3
+pysubs2==1.8.1
 ffmpeg-python==0.2.0
 python-multipart==0.0.20
 pydantic==2.10.4
