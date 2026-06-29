@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CaptionPreview } from "./CaptionPreview";
 import { StylePicker } from "./StylePicker";
+import { useRequireAuth } from "./AuthProvider";
 
 type Word = { word: string; start: number; end: number };
 
@@ -24,6 +25,7 @@ export function TranscriptEditor({
   videoId: string;
   videoUrl?: string;
 }) {
+  const { ready } = useRequireAuth();
   const [words, setWords] = useState<Word[]>(MOCK_WORDS);
   const [source, setSource] = useState<"mock" | "worker">("mock");
 
@@ -73,6 +75,8 @@ export function TranscriptEditor({
       /* non-blocking — correction capture is best-effort */
     }
   }
+
+  if (!ready) return <p className="mt-4 text-sm text-neutral-500">Loading…</p>;
 
   return (
     <>

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { inter, mukta } from "./fonts";
+import { AuthProvider } from "@/components/AuthProvider";
+import { AuthHeader } from "@/components/AuthHeader";
 
 export const metadata: Metadata = {
   title: "Nepali AI Caption",
@@ -26,7 +28,10 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <div id="main">{children}</div>
+        <AuthProvider>
+          <AuthHeader />
+          <div id="main">{children}</div>
+        </AuthProvider>
       </body>
     </html>
   );

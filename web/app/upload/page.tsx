@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadVideo } from "@/lib/storage";
+import { useRequireAuth } from "@/components/AuthProvider";
 
 type Phase = "idle" | "uploading" | "error";
 
 export default function UploadPage() {
   const router = useRouter();
+  const { ready } = useRequireAuth();
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +34,12 @@ export default function UploadPage() {
   }
 
   const busy = phase === "uploading";
+
+  if (!ready) {
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-24 text-neutral-500">Loading…</main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
