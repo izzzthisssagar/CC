@@ -6,6 +6,7 @@ import { StylePicker } from "./StylePicker";
 import { ChatPanel } from "./ChatPanel";
 import { useRequireAuth } from "./AuthProvider";
 import { loadTranscript, saveTranscript } from "@/lib/transcripts";
+import { indexTranscript } from "@/lib/rag";
 
 type Word = { word: string; start: number; end: number };
 
@@ -58,6 +59,7 @@ export function TranscriptEditor({
           try {
             const tid = await saveTranscript(videoId, data.words, data.language ?? null);
             if (tid) setTranscriptId(tid);
+            indexTranscript(videoId, data.words).catch(() => {}); // RAG index, best-effort
           } catch {
             /* best-effort */
           }
@@ -106,6 +108,7 @@ export function TranscriptEditor({
             try {
               const tid = await saveTranscript(videoId, data.words, data.language ?? null);
               if (tid && !cancelled) setTranscriptId(tid);
+              indexTranscript(videoId, data.words).catch(() => {}); // RAG index, best-effort
             } catch {
               /* save best-effort */
             }

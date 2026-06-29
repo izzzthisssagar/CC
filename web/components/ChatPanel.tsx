@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { searchAcrossVideos } from "@/lib/rag";
 
 type Word = { word: string; start: number; end: number };
 type Turn = { q: string; a: string };
+type Scope = "video" | "all";
 
-// Ask questions about the video. Sends the current (corrected) transcript as context.
+// Ask questions about the video. Scope "video" sends the current (corrected) transcript;
+// scope "all" retrieves the most relevant chunks across ALL the user's videos (RAG).
 export function ChatPanel({ words }: { words: Word[] }) {
   const [q, setQ] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
+  const [scope, setScope] = useState<Scope>("video");
 
   async function ask(e: React.FormEvent) {
     e.preventDefault();
@@ -17,7 +21,16 @@ export function ChatPanel({ words }: { words: Word[] }) {
     if (!question || busy) return;
     setBusy(true);
     setQ("");
-    const transcript = words.map((w) => w.word).join(" ");
+    // Build the context: this video's words, or top RAG hits across all videos.
+    let transcript: string;
+    if (scope === "all") {
+      const hits = await searchAcrossVideos(question);
+      transcript = hits.length
+        ? hits.map((h) => h.chunk_text).join("\n")
+        : words.map((w) => w.word).join(" "); // fall back to this video if nothing indexed
+    } else {
+      transcript = words.map((w) => w.word).join(" ");
+    }
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -35,9 +48,26 @@ export function ChatPanel({ words }: { words: Word[] }) {
 
   return (
     <section className="mt-8 rounded-xl border border-neutral-800 p-5">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-        Ask about this video
-      </h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+          {scope === "all" ? "Ask across my videos" : "Ask about this video"}
+        </h2>
+        <div className="flex rounded border border-neutral-700 text-xs" role="group" aria-label="chat scope">
+          {(["video", "all"] as const).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setScope(s)}
+              aria-pressed={scope === s}
+              className={`px-2.5 py-1 ${
+                scope === s ? "bg-yellow-400 font-semibold text-black" : "text-neutral-400"
+              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400`}
+            >
+              {s === "video" ? "This video" : "All videos"}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="mt-3 flex flex-col gap-3" aria-live="polite">
         {turns.length === 0 && (
