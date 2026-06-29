@@ -80,6 +80,7 @@ def main() -> int:
     model = WhisperForConditionalGeneration.from_pretrained(args.base)
     model.generation_config.language = args.language
     model.generation_config.task = "transcribe"
+    model.config.use_cache = False  # required alongside gradient_checkpointing below
 
     targs = Seq2SeqTrainingArguments(
         output_dir=args.out,

@@ -17,6 +17,44 @@ user corrections ──► export_dataset.py ──► train.jsonl {audio, text}
                                   serve behind the worker (new STT provider)
 ```
 
+## 0. Bootstrap with public data (before you have corrections)
+
+**What kind of data?** Whisper fine-tuning needs `(audio clip, correct transcript)` pairs —
+short utterances (~1–15s) of Nepali speech, each with a verified Devanagari transcript, as
+JSONL `{"audio": <path>, "text": <correct text>}`. The model resamples to 16 kHz mono on
+load, so source sample rate doesn't matter.
+
+Your own corrections are the moat, but the `corrections` table starts empty — so bootstrap
+the base Nepali competence with **public Nepali ASR corpora**, then layer your corrections
+on top:
+
+| Dataset | Size | Format | License | Notes |
+|---------|------|--------|---------|-------|
+| **OpenSLR SLR54** (Large Nepali ASR, Google) | ~157k utts, 16 parts ×~580 MB (~9 GB) | wav + `utt_spk_text.tsv` | CC BY-SA 4.0 | **Primary.** Free, no login. Download a few parts to start. |
+| OpenSLR SLR43 (Nepali multi-speaker) | smaller, cleaner | flac + index | CC BY-SA 4.0 | Good quality, fewer hours. |
+| Google **FLEURS** `ne_np` (HF `google/fleurs`) | ~12 h | HF `datasets` | CC BY 4.0 | Cleanest; needs `pip install datasets`. |
+| Mozilla **Common Voice** `ne-NP` | ~2 h, growing | HF (gated) | CC0 | Crowdsourced; accept terms on HF. |
+| HF `amitpant7/nepali-speech-to-text` | ~3k clips, 949 MB | HF `datasets` | per-source | Pre-cleaned SLR43+CV blend. |
+
+**None of these have Ninglish (Nepali-English code-switching)** — that's exactly the gap
+only your correction loop fills. Use public data to fix base Nepali; use your corrections
+to win Ninglish.
+
+Prepare SLR54 into the training JSONL (download is curl-able, no ML deps):
+```bash
+cd worker/datasets/openslr54
+curl -L -O https://www.openslr.org/resources/54/utt_spk_text.tsv
+curl -L -O https://www.openslr.org/resources/54/asr_nepali_0.zip   # one ~580 MB part
+unzip -q asr_nepali_0.zip
+cd ../.. && python -m scripts.prepare_openslr \
+    --tsv datasets/openslr54/utt_spk_text.tsv \
+    --audio-dir datasets/openslr54 \
+    --out datasets/openslr54/train.jsonl
+```
+`prepare_openslr.py` joins the TSV to whatever audio you actually extracted, so grabbing 1
+part (~10k utts) or all 16 both yield a valid JSONL. Lives under the gitignored
+`worker/datasets/`.
+
 ## 1. Build the dataset
 
 Accumulate corrections (the editor's correction loop fills `corrections` with audio),
