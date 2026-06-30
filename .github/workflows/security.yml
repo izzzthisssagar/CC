@@ -17,3 +17,6 @@ jobs:
           fetch-depth: 0
       - name: gitleaks
         uses: gitleaks/gitleaks-action@v3
+        env:
+          # gitleaks-action@v3 requires a token to scan pull_request events.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
