@@ -12,10 +12,15 @@ export default function UploadPage() {
   const { ready } = useRequireAuth();
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
 
-  async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  async function handleFile(file: File | undefined) {
     if (!file) return;
+    if (file.type && !file.type.startsWith("video/")) {
+      setError("That doesn't look like a video file (MP4 / MOV).");
+      setPhase("error");
+      return;
+    }
     setPhase("uploading");
     setError(null);
     try {
@@ -31,6 +36,20 @@ export default function UploadPage() {
       setError(err instanceof Error ? err.message : "Upload failed");
       setPhase("error");
     }
+  }
+
+  function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    handleFile(e.target.files?.[0]);
+  }
+
+  // Drag-and-drop path: dropping a file goes through DataTransfer and never opens
+  // the native OS file picker — a workaround for the macOS file-dialog crash some
+  // browser builds hit. Same handleFile path as the click-to-choose input.
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    if (busy) return;
+    handleFile(e.dataTransfer.files?.[0]);
   }
 
   const busy = phase === "uploading";
@@ -52,10 +71,20 @@ export default function UploadPage() {
         style the captions.
       </p>
 
-      <label className="rise mt-10 flex h-60 cursor-pointer flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-rule bg-ink-raised text-muted transition hover:border-brand-500/70 hover:bg-brand-700/10 focus-within:ring-2 focus-within:ring-saffron">
+      <label
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!busy) setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDrop}
+        className={`rise mt-10 flex h-60 cursor-pointer flex-col items-center justify-center gap-3 rounded-sm border border-dashed bg-ink-raised text-muted transition focus-within:ring-2 focus-within:ring-saffron hover:border-brand-500/70 hover:bg-brand-700/10 ${
+          dragging ? "border-saffron bg-brand-700/20" : "border-rule"
+        }`}
+      >
         <span className="font-deva-display text-5xl text-brand-500">{busy ? "…" : "स्व"}</span>
         <span className="font-display text-lg text-fg">
-          {busy ? "Processing…" : "Click to choose a video"}
+          {busy ? "Processing…" : dragging ? "Drop to upload" : "Click or drop a video"}
         </span>
         <span className="text-xs uppercase tracking-[0.16em] text-faint">
           Devanagari · Roman · Ninglish
