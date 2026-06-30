@@ -6,5 +6,5 @@ datasets>=2.20
 accelerate>=0.33
 evaluate>=0.4.6
 jiwer>=4.0.0
-librosa>=0.10
+librosa>=0.11.0
 soundfile>=0.12
