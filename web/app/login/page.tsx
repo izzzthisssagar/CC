@@ -1,17 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, signUp, stub } = useAuth();
+  const { signIn, signUp, stub, email: authedEmail, loading } = useAuth();
   const [mode, setMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // Redirect whenever a session is present — covers both "signed in just now"
+  // (the auth state flips async after signIn, so an immediate push races
+  // useRequireAuth and bounces back here) and "already signed in but landed on
+  // /login". Driving off the real session is what makes it reliable.
+  useEffect(() => {
+    if (!stub && !loading && authedEmail) router.replace("/upload");
+  }, [stub, loading, authedEmail, router]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,10 +28,9 @@ export default function LoginPage() {
     try {
       if (mode === "in") await signIn(email, password);
       else await signUp(email, password);
-      router.push("/upload");
+      // Navigation handled by the effect above once the session resolves.
     } catch (err) {
       setError(err instanceof Error ? err.message : "Auth failed");
-    } finally {
       setBusy(false);
     }
   }

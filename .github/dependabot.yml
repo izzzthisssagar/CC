@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Tailwind v4 is a breaking rewrite (PostCSS plugin moved, CSS-first
+      # config). Stay on v3 until a deliberate migration; don't auto-PR majors.
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: pip
     directory: /worker
