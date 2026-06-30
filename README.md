@@ -1,4 +1,6 @@
-# Nepali AI Caption App
+# BoldaBoldai — बोल्दाबोल्दै
+
+> *"as you speak"* — Nepali-first AI captions.
 
 Nepali-first AI auto-captioning web app — upload a video, get karaoke-style word-level
 captions with deep Devanagari / Roman Nepali / **Ninglish** support, export burned-in MP4 +

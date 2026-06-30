@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
 test.describe("landing", () => {
   test("loads and shows the hero + start CTA", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/Nepali AI Caption/);
+    await expect(page).toHaveTitle(/BoldaBoldai/);
     await expect(page.getByRole("link", { name: /start captioning/i })).toBeVisible();
   });
 });

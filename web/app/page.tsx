@@ -151,8 +151,9 @@ export default function Home() {
       <footer className="border-t border-rule">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-10 text-sm text-faint sm:flex-row">
           <span className="flex items-baseline gap-2">
-            <span className="font-deva-display text-lg text-brand-500">ने</span>
-            <span className="font-display font-semibold text-muted">Nepali AI Caption</span>
+            <span className="font-deva-display text-lg text-brand-500">बो</span>
+            <span className="font-display font-semibold text-muted">BoldaBoldai</span>
+            <span className="font-deva text-xs text-faint">— बोल्दाबोल्दै, captions as you speak</span>
           </span>
           <span className="font-display italic">
             Set in Fraunces &amp; Mukta · Devanagari · Roman · Ninglish · made for Nepal 🇳🇵

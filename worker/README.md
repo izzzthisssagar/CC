@@ -19,8 +19,8 @@ returns placeholder URLs. Set the key in env / `.env` to go live.
 ## Docker (FFmpeg + libass + fonts baked in)
 
 ```bash
-docker build -t nepali-caption-worker -f worker/Dockerfile .   # build from repo root (needs fonts/)
-docker run -p 8000:8000 -e GROQ_API_KEY=$GROQ_API_KEY nepali-caption-worker
+docker build -t boldaboldai-worker -f worker/Dockerfile .   # build from repo root (needs fonts/)
+docker run -p 8000:8000 -e GROQ_API_KEY=$GROQ_API_KEY boldaboldai-worker
 ```
 
 ## Files

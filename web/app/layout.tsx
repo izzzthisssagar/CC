@@ -5,7 +5,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { AuthHeader } from "@/components/AuthHeader";
 
 export const metadata: Metadata = {
-  title: "Nepali AI Caption — captions that speak नेपाली",
+  title: "BoldaBoldai — captions that speak नेपाली",
   description: "Nepali-first AI auto-captioning — Devanagari, Roman, Ninglish.",
 };
 

@@ -16,12 +16,12 @@ export function AuthHeader() {
       <div className="mx-auto flex max-w-6xl items-baseline justify-between gap-4 px-6 py-4">
         {/* Nameplate */}
         <Link href="/" className="group flex items-baseline gap-2.5">
-          <span className="font-deva-display text-2xl leading-none text-brand-500">ने</span>
+          <span className="font-deva-display text-2xl leading-none text-brand-500">बो</span>
           <span className="font-display text-lg font-semibold leading-none tracking-tight text-fg">
-            Nepali&nbsp;AI&nbsp;Caption
+            BoldaBoldai
           </span>
-          <span className="hidden text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-faint sm:inline">
-            · काठमाडौँ
+          <span className="hidden font-deva text-[0.7rem] tracking-wide text-faint sm:inline">
+            बोल्दाबोल्दै
           </span>
         </Link>
 
