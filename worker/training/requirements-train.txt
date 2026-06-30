@@ -2,9 +2,9 @@
 # A CUDA GPU is required. See docs/FINETUNE.md.
 torch>=2.12.1
 transformers>=5.12.1   # processing_class= arg (replaces removed tokenizer=)
-datasets>=2.20
+datasets>=5.0.0
 accelerate>=1.14.0
 evaluate>=0.4.6
 jiwer>=4.0.0
 librosa>=0.11.0
-soundfile>=0.12
+soundfile>=0.14.0
