@@ -113,13 +113,22 @@ python worker/training/eval_wer.py --test datasets/test.jsonl \
 Lower WER = better. If the fine-tune doesn't beat the base, you need more/cleaner data —
 don't ship it. Re-run against the same held-out clips each round to track progress.
 
-## 4. Serve it
+## 4. Serve it — WIRED
 
-Add a provider to `worker/app/stt.py` (e.g. `finetuned`) that loads `models/whisper-ne`
-via a transformers ASR pipeline, and set `STT_PROVIDER=finetuned`. Run this on the GPU
-box (transformers+torch is too heavy for the lean FastAPI worker container) — the worker
-calls it as a remote STT endpoint, same interface as Groq/Gladia. WhisperX can be layered
-for millisecond word alignment (blueprint §7).
+The `finetuned` provider is built (`worker/app/stt.py::finetuned_transcribe`): it loads the
+model from `FINETUNE_MODEL_DIR` (default `worker/models/whisper-ne`) via a transformers ASR
+pipeline with `return_timestamps="word"`, same `(words, language)` interface as Groq/Gladia.
+To run it:
+```bash
+pip install -r worker/training/requirements-train.txt   # torch+transformers (heavy)
+export FINETUNE_MODEL_DIR=worker/models/whisper-ne       # the trained model dir
+export STT_PROVIDER=finetuned
+# or pick per-request: POST /transcribe { "provider": "finetuned" }
+```
+Run this on a **GPU box** — torch/transformers is too heavy for the lean FastAPI worker
+image, so the base `requirements.txt` stays torch-free and the import is lazy. The model
+binary lives in the gitignored `worker/models/` (serve it from the HF Hub or object storage
+in prod, not git). WhisperX can be layered for millisecond word alignment (blueprint §7).
 
 ## Cadence
 

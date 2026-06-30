@@ -84,7 +84,39 @@ def gladia_transcribe(audio_path: str, language: str | None = None) -> tuple[lis
     raise TimeoutError("gladia transcription timed out")
 
 
-PROVIDERS = {"groq": groq_transcribe, "gladia": gladia_transcribe}
+def finetuned_transcribe(audio_path: str, language: str | None = None) -> tuple[list[dict], str]:
+    """The moat: our fine-tuned Nepali Whisper (see docs/FINETUNE.md).
+
+    HEAVY — lazy-imports transformers+torch (NOT in the base worker reqs; install
+    training/requirements-train.txt) and loads the model from FINETUNE_MODEL_DIR
+    (default worker/models/whisper-ne). Run on a GPU box with STT_PROVIDER=finetuned;
+    the lean FastAPI image stays torch-free.
+    """
+    from transformers import pipeline  # lazy: torch/transformers are training-only deps
+
+    model_dir = os.getenv("FINETUNE_MODEL_DIR", "models/whisper-ne")
+    lang = language or "nepali"
+    asr = pipeline(
+        "automatic-speech-recognition",
+        model=model_dir,
+        return_timestamps="word",  # word-level ts — HARD RULE for karaoke
+        generate_kwargs={"language": lang, "task": "transcribe"},
+    )
+    out = asr(audio_path)
+    words: list[dict] = []
+    for c in out.get("chunks", []):
+        ts = c.get("timestamp") or (None, None)
+        if ts[0] is None or ts[1] is None:
+            continue  # drop unaligned tokens rather than emit bad timing
+        words.append({"word": (c.get("text") or "").strip(), "start": ts[0], "end": ts[1]})
+    return words, "ne" if lang == "nepali" else lang
+
+
+PROVIDERS = {
+    "groq": groq_transcribe,
+    "gladia": gladia_transcribe,
+    "finetuned": finetuned_transcribe,
+}
 
 
 def transcribe(audio_path: str, provider: str | None = None, language: str | None = None):

@@ -54,3 +54,8 @@ datasets/
 worker/datasets/
 
 seed-starters/
+
+# Fine-tuned models (binaries — serve from HF Hub / object storage, never git)
+models/
+worker/models/
+whisper-ne*
