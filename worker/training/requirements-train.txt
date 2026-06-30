@@ -3,7 +3,7 @@
 torch>=2.12.1
 transformers>=5.12.1   # processing_class= arg (replaces removed tokenizer=)
 datasets>=2.20
-accelerate>=0.33
+accelerate>=1.14.0
 evaluate>=0.4.6
 jiwer>=4.0.0
 librosa>=0.11.0
