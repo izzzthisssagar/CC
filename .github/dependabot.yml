@@ -10,14 +10,26 @@ updates:
       # config). Stay on v3 until a deliberate migration; don't auto-PR majors.
       - dependency-name: "tailwindcss"
         update-types: ["version-update:semver-major"]
+    # One combined PR for all web deps — avoids N PRs each editing the same
+    # package-lock.json and conflicting with each other one merge at a time.
+    groups:
+      web:
+        patterns: ["*"]
 
   - package-ecosystem: pip
     directory: /worker
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # One combined PR for all worker deps (they all touch requirements*.txt).
+    groups:
+      worker:
+        patterns: ["*"]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
