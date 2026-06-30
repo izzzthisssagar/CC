@@ -1,6 +1,6 @@
 # GPU fine-tuning deps — install ONLY in the training env (not the worker/CI).
 # A CUDA GPU is required. See docs/FINETUNE.md.
-torch>=2.2
+torch>=2.12.1
 transformers>=5.12.1   # processing_class= arg (replaces removed tokenizer=)
 datasets>=2.20
 accelerate>=0.33
